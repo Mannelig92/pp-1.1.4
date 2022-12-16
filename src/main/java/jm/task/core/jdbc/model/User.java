@@ -1,24 +1,26 @@
 package jm.task.core.jdbc.model;
 
-import javax.persistence.Column;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-@Table
+@Entity
+@Table(name = "newUsers") //Можно не писать в скобках если название таблицы совпадает с классом, но лучше писать
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    //Column указывает на то к какому именно столбцу мы привязываем это поле
     private Long id;
 
-    @Column
+    @Column(name = "name")
     private String name;
 
-    @Column
+    @Column(name = "lastName")
     private String lastName;
 
-    @Column
+    @Column(name = "age")
     private Byte age;
 
-    public User() {
+    public User() { //Обязатален конструктор без аргументов для Hibernate
 
     }
 

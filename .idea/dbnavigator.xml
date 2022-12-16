@@ -28,6 +28,7 @@
         <condition column="id" operator="=" value="" active="true" />
       </filter>
     </filter-actions>
+    <filter-actions connection-id="b0d8d530-ac9b-4396-86e7-42c4397ecf0d" dataset="mydbtest.newusers" active-filter-id="" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
