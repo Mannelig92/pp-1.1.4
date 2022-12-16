@@ -21,7 +21,7 @@ public class Main {
         userDao.getAllUsers();
         userService.getAllUsers();
 
-        userDao.cleanUsersTable();
-        userDao.dropUsersTable();
+//        userDao.cleanUsersTable();
+//        userDao.dropUsersTable();
     }
 }
