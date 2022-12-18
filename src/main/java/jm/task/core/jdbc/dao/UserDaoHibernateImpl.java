@@ -15,7 +15,7 @@ import java.util.List;
 1)Не сохраняет объект в БД, не понимаю почему
 2)Не получается вызвать метод createSQLQuery, полагаю им нужно заменить createQuery
 3)Вместо save использовать persist?
-4)Что использовать из более нового для сохранение в БД?
+4)Что использовать из более нового для сохранения в БД?
  */
 public class UserDaoHibernateImpl implements UserDao {
     Transaction transaction = null;
