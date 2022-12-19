@@ -35,7 +35,7 @@ public class Util {
     }
 
     public static SessionFactory getSessionFactory() {
-        if (sessionFactory == null) {
+//        if (sessionFactory == null) {
             try {
                 Configuration configuration = new Configuration();
 
@@ -49,6 +49,7 @@ public class Util {
                 settings.put(Environment.SHOW_SQL, "true");
 
                 settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+//                settings.put(Environment.AUTOCOMMIT, false);
 
                 settings.put(Environment.HBM2DDL_AUTO, "create-drop"); //не даёт автоматически создать таблицу
 
@@ -57,13 +58,17 @@ public class Util {
                 configuration.addAnnotatedClass(User.class);
 
                 ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                        .applySettings(configuration.getProperties()).build();
+                        .applySettings(configuration.getProperties())
+                        .build();
 
                 sessionFactory = configuration.buildSessionFactory(serviceRegistry);
             } catch (Exception e) {
                 System.out.println("Ошибка соединения");
             }
-        }
+//        }else {
+//            System.out.println("Не создать подключение");
+//            throw new RuntimeException();
+//        }
         return sessionFactory;
     }
 

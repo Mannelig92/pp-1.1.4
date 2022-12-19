@@ -13,7 +13,7 @@ import java.util.List;
 /*
 Вопросы:
 1)Не сохраняет объект в БД, не понимаю почему
-2)Не получается вызвать метод createSQLQuery, полагаю им нужно заменить createQuery
+2)Не получается вызвать метод createSQLQuery(Видимо удалён как устаревший), полагаю им нужно заменить createQuery
 3)Вместо save использовать persist?
 4)Что использовать из более нового для сохранения в БД?
  */
@@ -25,12 +25,12 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
-    public void createUsersTable() {
+    public void createUsersTable() { // Таблица создаётся
         try (Session session = Util.getSessionFactory().openSession()) { //Работает, но исполняется каждый раз, хотя стоит IF NOT EXISTS
             transaction = session.beginTransaction();
             String sql = "CREATE TABLE IF NOT EXISTS newUsers (Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
                     "name VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, age INT NOT NULL)";
-            Query query = session.createQuery(sql); //Устаревший, но я так и не нашёл чем его заменить
+            Query query = session.createNativeQuery(sql); //Устаревший, но я так и не нашёл чем его заменить
             query.executeUpdate();
             System.out.println("Таблица создана");
             transaction.commit();
@@ -44,7 +44,7 @@ public class UserDaoHibernateImpl implements UserDao {
     }
 
     @Override
-    public void dropUsersTable() {
+    public void dropUsersTable() { //Таблица удаляется
 
         try (Session session = Util.getSessionFactory().openSession()) { //Работает
             transaction = session.beginTransaction();
@@ -66,17 +66,15 @@ public class UserDaoHibernateImpl implements UserDao {
     @Override
     public void saveUser(String name, String lastName, byte age) { //Не работает
         try (Session session = Util.getSessionFactory().openSession()) {
-
-            User user = new User(name, lastName, age);
-            session.persist(user); //persist заменяет устаревший save
-
             transaction = session.beginTransaction();
+            User user = new User(name, lastName, age);
+            session.persist(user); //persist полагаю заменяет устаревший save
             transaction.commit();
-
+//            transaction = null;
         } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
+//            if (transaction != null) {
+//                transaction.rollback();
+//            }
             throw new RuntimeException();
         }
     }

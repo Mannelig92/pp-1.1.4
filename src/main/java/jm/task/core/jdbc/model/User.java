@@ -20,7 +20,7 @@ public class User {
     @Column(name = "age")
     private Byte age;
 
-    public User() { //Обязатален конструктор без аргументов для Hibernate
+    public User() { //Обязателен конструктор без аргументов для Hibernate
 
     }
 
