@@ -3,7 +3,8 @@ package jm.task.core.jdbc.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "newUsers") //Можно не писать в скобках если название таблицы совпадает с классом, но лучше писать
+@Table(name = "newUsers", schema = "public")
+//Можно не писать в скобках если название таблицы совпадает с классом, но лучше писать
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

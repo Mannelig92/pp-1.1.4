@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
-    private static final UserDao userDao = new UserDaoHibernateImpl();
+    private UserDao userDao = new UserDaoHibernateImpl();
 
     public void createUsersTable() {
         userDao.createUsersTable();
@@ -30,11 +30,11 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<User> getAllUsers() {
-        List<User> users = userDao.getAllUsers();
-        for (User i : users) {
+        List<User> user = userDao.getAllUsers();
+        for (User i : user) {
             System.out.println(i);
         }
-        return users;
+        return user;
     }
 
     public void cleanUsersTable() {

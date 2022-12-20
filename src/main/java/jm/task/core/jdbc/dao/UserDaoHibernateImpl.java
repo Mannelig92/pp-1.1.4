@@ -5,18 +5,10 @@ import jm.task.core.jdbc.model.User;
 import jm.task.core.jdbc.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.query.Query;
 
-
+import java.util.ArrayList;
 import java.util.List;
 
-/*
-Вопросы:
-1)Не сохраняет объект в БД, не понимаю почему
-2)Не получается вызвать метод createSQLQuery(Видимо удалён как устаревший), полагаю им нужно заменить createQuery
-3)Вместо save использовать persist?
-4)Что использовать из более нового для сохранения в БД?
- */
 public class UserDaoHibernateImpl implements UserDao {
     Transaction transaction = null;
 
@@ -26,92 +18,90 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() { // Таблица создаётся
-        try (Session session = Util.getSessionFactory().openSession()) { //Работает, но исполняется каждый раз, хотя стоит IF NOT EXISTS
-            transaction = session.beginTransaction();
+        try (Session session = Util.getSessionFactory().openSession()) { //Работает
             String sql = "CREATE TABLE IF NOT EXISTS newUsers (Id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, " +
-                    "name VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, age INT NOT NULL)";
-            Query query = session.createNativeQuery(sql); //Устаревший, но я так и не нашёл чем его заменить
-            query.executeUpdate();
-            System.out.println("Таблица создана");
+                    "name VARCHAR(255), lastName VARCHAR(255), age INT)";
+            transaction = session.beginTransaction();
+            session.createSQLQuery(sql).executeUpdate(); //Устаревший, но я так и не нашёл чем его заменить
             transaction.commit();
+            System.out.println("Таблица создана");
         } catch (Exception e) {
             if (transaction != null) {
-                transaction.rollback();
+                transaction.rollback(); //Откатывает транзакцию, если произошла ошибка
             }
-            throw new RuntimeException();
         }
 
     }
 
     @Override
     public void dropUsersTable() { //Таблица удаляется
-
-        try (Session session = Util.getSessionFactory().openSession()) { //Работает
+        try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             String sql = "DROP TABLE IF EXISTS newUsers";
-
-            Query query = session.createNativeQuery(sql); //Устаревший, но я так и не нашёл чем его заменить
-            query.executeUpdate();
-
+            session.createSQLQuery(sql).executeUpdate(); //Устаревший, но я так и не нашёл чем его заменить
             transaction.commit();
             System.out.println("Таблица удалена");
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException();
         }
     }
 
     @Override
-    public void saveUser(String name, String lastName, byte age) { //Не работает
+    public void saveUser(String name, String lastName, byte age) { //работает
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             User user = new User(name, lastName, age);
             session.persist(user); //persist полагаю заменяет устаревший save
             transaction.commit();
-//            transaction = null;
         } catch (Exception e) {
-//            if (transaction != null) {
-//                transaction.rollback();
-//            }
-            throw new RuntimeException();
+            if (transaction != null) {
+                transaction.rollback();
+                throw new RuntimeException();
+            }
         }
     }
 
     @Override
-    public void removeUserById(long id) { //Не проверял
+    public void removeUserById(long id) { //работает
         try (Session session = Util.getSessionFactory().openSession()) {
+            User user = session.get(User.class, id);
             transaction = session.beginTransaction();
-            session.remove(id);
+            session.delete(user);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException();
         }
     }
 
     @Override
-    public List<User> getAllUsers() { //Вроде должно быть правильно, но ещё не проверить
+    public List<User> getAllUsers() { //работает
+        List<User> users = new ArrayList<>();
         try (Session session = Util.getSessionFactory().openSession()) {
-            return session.createQuery("Пользователи", User.class).list();
+            session.beginTransaction();
+            users = session.createQuery("FROM User").list(); //Тут не имя таблицы
+            session.getTransaction().commit();
         } catch (Exception e) {
-            throw new RuntimeException();
+            e.printStackTrace();
         }
+        return users;
     }
 
     @Override
-    public void cleanUsersTable() { //доделать
+    public void cleanUsersTable() { //работает
         try (Session session = Util.getSessionFactory().openSession()) {
+            String sql = "TRUNCATE TABLE newUsers";
             transaction = session.beginTransaction();
-
+            session.createNativeQuery(sql).executeUpdate();
+            transaction.commit();
+            System.out.println("Таблица очищена");
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
-            throw new RuntimeException();
         }
     }
 }

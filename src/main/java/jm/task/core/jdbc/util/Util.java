@@ -35,40 +35,34 @@ public class Util {
     }
 
     public static SessionFactory getSessionFactory() {
-//        if (sessionFactory == null) {
-            try {
-                Configuration configuration = new Configuration();
+        try {
+            Configuration configuration = new Configuration();
 
-                Properties settings = new Properties();
-                settings.put(Environment.DRIVER, DRIVER);
-                settings.put(Environment.URL, URL);
-                settings.put(Environment.USER, USERNAME);
-                settings.put(Environment.PASS, PASSWORD);
-                settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
+            Properties settings = new Properties();
+            settings.put(Environment.DRIVER, DRIVER);
+            settings.put(Environment.URL, "jdbc:mysql://localhost:3306/mydbtest?useSSL=false");
+            settings.put(Environment.USER, USERNAME);
+            settings.put(Environment.PASS, PASSWORD);
+            settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQLDialect");
+            settings.put(Environment.SHOW_SQL, "true");
 
-                settings.put(Environment.SHOW_SQL, "true");
+            settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+            settings.put(Environment.AUTOCOMMIT, true);
+//
+//                settings.put(Environment.HBM2DDL_AUTO, "create-drop"); //не даёт автоматически создать таблицу
 
-                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
-//                settings.put(Environment.AUTOCOMMIT, false);
+            configuration.setProperties(settings);
 
-                settings.put(Environment.HBM2DDL_AUTO, "create-drop"); //не даёт автоматически создать таблицу
+            configuration.addAnnotatedClass(User.class);
 
-                configuration.setProperties(settings);
+            ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                    .applySettings(configuration.getProperties())
+                    .build();
 
-                configuration.addAnnotatedClass(User.class);
-
-                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                        .applySettings(configuration.getProperties())
-                        .build();
-
-                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-            } catch (Exception e) {
-                System.out.println("Ошибка соединения");
-            }
-//        }else {
-//            System.out.println("Не создать подключение");
-//            throw new RuntimeException();
-//        }
+            sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+        } catch (Exception e) {
+            System.out.println("Ошибка соединения");
+        }
         return sessionFactory;
     }
 
